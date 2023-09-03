@@ -33,22 +33,23 @@ const createUser = (request, response) => {
     .catch((e) => response.status(500).send(e.message));
 };
 
-const updateUser = (request, response) => {
+const updateUser = async (request, response) => {
   const { user_id } = request.params;
+  let existingUser;
+  try {
+    existingUser = await User.findById(user_id);
+    if (!existingUser) {
+      return response.status(404).send(`User with ID: ${user_id} not found`);
+    }
+  } catch (e) {
+    return response.status(404).send(`User with ID: ${user_id} not found`);
+  }
 
-  User.findById(user_id)
-    .then((existingUser) => {
-      if (!existingUser) {
-        // Если пользователя нет, возвращаем 404
-        return response.status(404).send(`User with ID: ${user_id} not found`);
-      }
-      User.findByIdAndUpdate(user_id, { ...request.body }, { new: true })
-        .then((user) => {
-          response.status(200).send(user);
-        })
-        .catch((e) => response.status(500).send(e.message));
+  User.findByIdAndUpdate(user_id, { ...request.body }, { new: true })
+    .then((user) => {
+      response.status(200).send(user);
     })
-    .catch((e) => response.status(404).send(`User with ID: ${user_id} not found`));
+    .catch((e) => response.status(500).send(e.message));
 };
 
 const deleteUser = (request, response) => {

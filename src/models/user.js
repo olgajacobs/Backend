@@ -15,5 +15,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     minLength: 5,
   },
+  mybooks: [{ _id: mongoose.Types.ObjectId, title: String, author: String, year: Number }],
 });
 module.exports = mongoose.model('user', userSchema);
